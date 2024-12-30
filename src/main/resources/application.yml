@@ -1,0 +1,45 @@
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    active: local
+
+mybatis:
+  configuration:
+    multiple-result-sets-enabled: false
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+    jdbc-type-for-null: varchar
+    default-fetch-size: 500
+  mapper-locations:
+    classpath: mybatis/mapper/*.xml
+
+pagehelper:
+  helper-dialect: h2
+  reasonable: true
+
+jwt:
+  header: Authorization
+  refresh-header: refreshToken
+  prefix: "Bearer "
+  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  secret: 4428472B4B6250655368566D597133743677397A244226452948404D635166546A576E5A7234753778214125442A462D4A614E645267556B5870327335763879
+  # 토큰 유지시간 분단위 입력
+  token-validity-in-seconds:
+    #토큰 유지시간 (60 * 24, 1일)
+    access: 1440
+    #토큰 유지시간 (60 * 24 * 30, 30일)
+    refresh: 43200
+
+platform: admin

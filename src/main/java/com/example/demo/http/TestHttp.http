@@ -1,0 +1,17 @@
+### 이름조회
+GET http://localhost:8080/api/test/name
+Content-Type: application/json; charset=utf-8
+Accept: application/json; charset=utf-8
+
+{
+  "name": "민승기"
+}
+
+### 이름저장
+POST http://localhost:8080/api/test/name
+Content-Type: application/json; charset=utf-8
+Accept: application/json; charset=utf-8
+
+{
+"name": "민승기"
+}

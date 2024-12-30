@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <property name="LOG_PATH" value="/var/log/tomcat"/>
+
+    <property name="LOG_FILE" value="tnkad_info.log"/>
+    <property name="LOG_ERROR_FILE" value="tnkad_info-error.log"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%logger{36}] [%-5level] - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%logger{36}:%L] [%-5level] - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_ERROR_FILE}-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%logger{36}:%L] [%-5level] - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- Loggers -->
+    <logger name="com.example.demo" level="DEBUG" />
+    <logger name="com.zaxxer.hikari" level="INFO" />
+    <logger name="jdbc.sqltiming" level="ERROR" />
+    <logger name="jdbc.sqlonly" level="INFO" />
+    <logger name="jdbc.resultset" level="ERROR" />
+    <logger name="jdbc.resultsettable" level="ERROR" />
+    <logger name="jdbc.audit" level="ERROR" />
+    <logger name="com" level="ERROR" />
+    <logger name="org" level="ERROR" />
+    <logger name="org.springframework" level="ERROR" />
+    <logger name="org.mybatis.spring.batch" level="DEBUG" />
+    <logger name="springfox.documentation" level="ERROR" />
+    <logger name="springframework" level="ERROR" />
+    <logger name="io.lettuce.core.protocol" level="INFO" />
+    <logger name="net.javacrumbs.shedlock" level="DEBUG" />
+
+    <root>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+
+</configuration>
