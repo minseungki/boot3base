@@ -234,6 +234,11 @@ public class SpringDocConfig {
                 + "- Swagger의 경우 개발 편의를 위해 Bearer는 생략합니다.\n\n"
                 + "</details>\n\n"
 
+                + "<details> <summary>Swagger 사용법</summary>\n\n"
+                + "<a href=\"https://github.com/minseungki/boot3base/blob/main/doc/client.md\" target=\"_blank\">클라이언트 가이드 바로가기</a>\n\n"
+                + "<a href=\"https://github.com/minseungki/boot3base/blob/main/doc/backend.md\" target=\"_blank\">백엔드 가이드 바로가기</a>\n\n"
+                + "</details>\n\n"
+
             + "</blockquote>"
             ;
         return updateView + guide + "<details> <summary>가이드 보기</summary>\n\n" + guideObject + "</details>";
