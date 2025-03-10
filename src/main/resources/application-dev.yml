@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.h2.Driver
-    jdbc-url: jdbc:h2:mem:testdb
+    jdbc-url: jdbc:h2:file:./data/testdb
     username: sa
     password:
 
@@ -14,15 +14,6 @@ spring:
           max-active: 10
           max-idle: 5
           min-idle: 5
-
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui
-    operationsSorter: method
-    tagsSorter: name
-  default-produces-media-type: application/json
 
 logging:
   config: classpath:logback-dev.xml

@@ -1,17 +1,41 @@
-### 이름조회
-GET http://localhost:8080/api/test/name
+### 로그인
+< {%
+    // request.variables.set("body", {});
+%}
+POST http://localhost:8080/api/login
 Content-Type: application/json; charset=utf-8
 Accept: application/json; charset=utf-8
 
 {
-  "name": "민승기"
+  "id": "USER",
+  "password": "PWD"
 }
 
-### 이름저장
-POST http://localhost:8080/api/test/name
+> {%
+    client.test("Extract token", function() {   // 테스트 이름
+        if (response.body.code === "SUC200_001") {
+            client.global.set("accessToken", response.body.data.accessToken); // 응답에서 token 값을 변수에 저장
+            if (response.body.data.refreshToken) {
+                client.global.set("refreshToken", response.body.data.refreshToken); // 응답에서 token 값을 변수에 저장
+            }
+        }
+    });
+%}
+
+### 게시판 조회
+@currentPage = 1
+@bbsSectionCd = NOTICE
+@searchWord =
+
+GET http://localhost:8080//api/bbs?currentPage={{currentPage}}&bbsSectionCd={{bbsSectionCd}}&searchWord={{searchWord}}
 Content-Type: application/json; charset=utf-8
 Accept: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
 
-{
-"name": "민승기"
-}
+### 토큰 복호화 (권한 체크 : DECELOPER만 가능)
+POST http://localhost:8080//api/com/decode-token
+Content-Type: application/json; charset=utf-8
+Accept: application/json; charset=utf-8
+Authorization: Bearer {{accessToken}}
+
+{{accessToken}}

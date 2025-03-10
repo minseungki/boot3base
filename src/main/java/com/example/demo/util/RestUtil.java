@@ -1,5 +1,6 @@
 package com.example.demo.util;
 
+import com.example.demo.dto.common.enumeration.CustomErrorCode;
 import com.example.demo.dto.common.enumeration.ErrorCode;
 import com.example.demo.dto.common.enumeration.ErrorField;
 import com.example.demo.dto.common.EmptyResponse;
@@ -8,9 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -23,12 +30,29 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Slf4j
+@Component
 public class RestUtil {
 
     private static final ObjectMapper objectMapper; // ObjectMapper
 
-    private static final String SUC_CODE = "SUC001";
+    private static final String SUC_CODE = "SUC200_001";
     private static final String SUC_MSG = "처리가 완료되었습니다.";
+
+    @Value("${jwt.header}")
+    private String HEADER_AUTH_VALUE;
+
+    @Value("${jwt.header-refresh}")
+    private String HEADER_AUTH_REFRESH_VALUE;
+
+    private static String HEADER_AUTH;
+    private static String HEADER_AUTH_REFRESH;
+
+    @PostConstruct
+    public void init() {
+        HEADER_AUTH = HEADER_AUTH_VALUE;
+        HEADER_AUTH_REFRESH = HEADER_AUTH_REFRESH_VALUE;
+    }
 
     private static final EmptyResponse emptyDto = new EmptyResponse();
 
@@ -61,7 +85,10 @@ public class RestUtil {
     }
 
     public static <T> ResponseEntity<ResponseModel<T>> notfound() {
-        return error(NOT_FOUND, ErrorCode.ERR404_002, null);
+        return error(NOT_FOUND, ErrorCode.ERR404_001, null);
+    }
+    public static <T> ResponseEntity<ResponseModel<T>> forbidden() {
+        return error(FORBIDDEN, ErrorCode.ERR403_001, null);
     }
     public static <T> ResponseEntity<ResponseModel<T>> falsifyToken() {
         return error(UNAUTHORIZED, ErrorCode.ERR401_002, null);
@@ -179,9 +206,106 @@ public class RestUtil {
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            printStackTraceInfo(e);
         }
         return hostAddr;
+    }
+
+    public static void printStackTraceInfo(final Exception error) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+        log.error("====================================================================");
+        log.error("Exception \t\t: " + error.getClass().getSimpleName());
+        log.error("Request URI \t\t: " + request.getRequestURI());
+        log.error("Request Method \t: " + request.getMethod());
+
+        String param = RequestUtil.removeMapInKey(request);
+        if (StringUtils.hasText(param)) {
+            log.error("Param \t: " + param);
+        }
+
+        String body = RequestUtil.removeJsonObjectInKey(request);
+        if (StringUtils.hasText(body)) {
+            log.error("Body \t: " + body);
+        }
+
+        if (!ObjectUtils.isEmpty(error.getCause())) {
+            log.error("Cause \t\t\t: " + error.getCause());
+        }
+
+        if (StringUtils.hasText(error.getMessage())) {
+            log.error("Message \t\t\t: " + error.getMessage());
+        }
+
+        String accessToken = request.getHeader(HEADER_AUTH);
+        if (StringUtils.hasText(HEADER_AUTH) && StringUtils.hasText(accessToken)) {
+            log.error("Access Token \t: " + accessToken);
+        }
+
+        String refreshToken = request.getHeader(HEADER_AUTH_REFRESH);
+        if (StringUtils.hasText(HEADER_AUTH_REFRESH) && StringUtils.hasText(refreshToken)) {
+            log.error("Refresh Token \t: " + refreshToken);
+        }
+
+        for (StackTraceElement element : error.getStackTrace()) {
+            String target = element.toString();
+            if (target.contains("com.example.demo") && !target.contains("<generated>")) {
+                log.error("at " + element);
+            }
+        }
+        log.error("====================================================================");
+    }
+
+    public static CustomErrorCode getEnumByCode(String enumPackage, String enumCode) {
+        try {
+            // name으로 클래스 로드 (패키지 경로 포함)
+            Class<?> enumClass = Class.forName(enumPackage);
+
+            // enum 클래스인지 확인
+            if (enumClass.isEnum() && CustomErrorCode.class.isAssignableFrom(enumClass)) {
+                // 해당 enum 클래스의 모든 상수 가져오기
+                Object[] enumConstants = enumClass.getEnumConstants();
+
+                for (Object enumConstant : enumConstants) {
+                    if (((Enum<?>) enumConstant).name().equals(enumCode)) {
+                        return (CustomErrorCode) enumConstant; // 인터페이스 타입으로 캐스팅
+                    }
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            printStackTraceInfo(ex);
+        }
+        return null;
+    }
+
+    public static boolean hasRequest() {
+        return !ObjectUtils.isEmpty(RequestContextHolder.getRequestAttributes());
+    }
+
+    public static <T> T getAttribute(String attributeName, Class<T> valueType) {
+        if (hasRequest()) {
+            HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            return (T) req.getAttribute(attributeName);
+        } else {
+            return null;
+        }
+    }
+
+    public static <T> T getAttribute(String attributeName) {
+        return (T) getAttribute(attributeName, String.class);
+    }
+
+    public static <T> T getHeader(String headerName, Class<T> valueType) {
+        if (hasRequest()) {
+            HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            return (T) req.getHeader(headerName);
+        } else {
+            return null;
+        }
+    }
+
+    public static <T> T getHeader(String headerName) {
+        return (T) getHeader(headerName, String.class);
     }
 
 }

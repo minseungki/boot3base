@@ -15,15 +15,19 @@ spring:
   profiles:
     active: local
 
-mybatis:
-  configuration:
-    multiple-result-sets-enabled: false
-    map-underscore-to-camel-case: true
-    call-setters-on-nulls: true
-    jdbc-type-for-null: varchar
-    default-fetch-size: 500
-  mapper-locations:
-    classpath: mybatis/mapper/*.xml
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui
+    tags-sorter: alpha
+    operationsSorter: method
+    tagsSorter: name
+    docExpansion: none   # API 기본적으로 접어두기
+    syntaxHighlight:
+      activated: true   # 코드 색상 강조
+  default-produces-media-type: application/json
 
 pagehelper:
   helper-dialect: h2
@@ -31,15 +35,23 @@ pagehelper:
 
 jwt:
   header: Authorization
-  refresh-header: refreshToken
+  header-refresh: Authorization-Refresh
   prefix: "Bearer "
-  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  # HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
   secret: 4428472B4B6250655368566D597133743677397A244226452948404D635166546A576E5A7234753778214125442A462D4A614E645267556B5870327335763879
-  # 토큰 유지시간 분단위 입력
-  token-validity-in-seconds:
-    #토큰 유지시간 (60 * 24, 1일)
-    access: 1440
-    #토큰 유지시간 (60 * 24 * 30, 30일)
-    refresh: 43200
 
-platform: admin
+  # 토큰 유지시간 분단위 입력
+  token-validity-in-time:
+    # 토큰 유지시간 (60 * 24, 1일)
+    access: 1440
+    # 토큰 유지시간 (60 * 24 * 30, 30일)
+    refresh: 43200
+  # 리프레시 토큰 자동 갱신 기준일 ( 자동 갱신 아니면 0 )
+  refresh-auto-renew-days: 15
+  platform-type: front
+
+encryption:
+  # 16자 이상
+  password: MySuperSecurePassword2024!
+  # 16~32바이트
+  salt: a9f8d7g6h5j4k3l2m1n0p9q8r7s6t5u

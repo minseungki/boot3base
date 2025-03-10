@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.BbsMapper">
+
+    <!-- 게시판 Page 조회 -->
+    <select id="selectBbsPage" parameterType="BbsSelectPageRequest" resultType="BbsSelectPageResponse">
+        /* com.example.demo.mapper.BbsMapper.selectBbsPage */
+        SELECT
+              BBS_SEQ /*BBS_시퀀스*/
+            , BBS_SECTION_CD /*BBS_구분_코드-공지사항, FAQ, QnA*/
+            , TITLE /*제목*/
+            , CONTENTS /*내용*/
+            , EXPOSURE_BEGIN_DT /*노출_시작_일시*/
+            , EXPOSURE_END_DT /*노출_종료_일시*/
+            , EXPOSURE_YN
+            , USE_YN /*사용_여부*/
+            , REGISTER_SEQ /*등록자_시퀀스*/
+            , REGISTRATION_DT /*등록_일시*/
+            , UPDATER_SEQ/*수정자_시퀀스*/
+            , UPDATE_DT /*수정_일시*/
+            , REGISTER_IP /*등록자_IP*/
+            , UPDATER_IP /*수정자_IP*/
+        FROM
+            TB_BBS
+        WHERE
+            USE_YN = true
+        <if test="searchWord != null and searchWord != ''">
+            AND (CONTENTS LIKE CONCAT('%', #{searchWord}, '%')
+            OR TITLE LIKE CONCAT('%', #{searchWord}, '%') )
+        </if>
+            AND BBS_SECTION_CD = #{bbsSectionCd}
+        ORDER BY REGISTRATION_DT DESC
+    </select>
+
+
+    <!-- 게시판 상세 조회 -->
+    <select id="selectBbs" parameterType="bbsSelectRequest" resultType="BbsSelectResponse">
+        /* com.example.demo.mapper.BbsMapper.selectBbs */
+        SELECT
+              BBS_SEQ /*BBS_시퀀스*/
+            , BBS_SECTION_CD /*BBS_구분_코드-공지사항, FAQ, QnA*/
+            , TITLE /*제목*/
+            , CONTENTS /*내용*/
+            , EXPOSURE_BEGIN_DT /*노출_시작_일시*/
+            , EXPOSURE_END_DT /*노출_종료_일시*/
+            , EXPOSURE_YN /*노출_여부*/
+            , USE_YN /*사용_여부*/
+            , (SELECT NAME FROM TB_MANAGER WHERE MANAGER_SEQ = TB_BBS.REGISTER_SEQ) AS registerName /*등록자_시퀀스*/
+            , REGISTRATION_DT /*등록_일시*/
+            , (SELECT NAME FROM TB_MANAGER WHERE MANAGER_SEQ = TB_BBS.UPDATER_SEQ) AS updaterName/*수정자_시퀀스*/
+            , UPDATE_DT /*수정_일시*/
+        FROM
+            TB_BBS
+        WHERE
+            USE_YN = TRUE
+            AND BBS_SEQ = #{bbsSeq}
+    </select>
+
+    <!-- 게시판 등록 -->
+    <insert id="insertBbs" parameterType="bbsInsertRequest" useGeneratedKeys="true" keyColumn="BBS_SEQ" keyProperty="bbsSeq">
+        /* com.example.demo.mapper.BbsMapper.insertBbs */
+        INSERT INTO TB_BBS (
+              BBS_SECTION_CD /*BBS_구분_코드-공지사항, FAQ, QnA*/
+            , TITLE /*제목*/
+            , CONTENTS /*내용*/
+            , EXPOSURE_BEGIN_DT /*노출_시작_일시*/
+            , EXPOSURE_END_DT /*노출_종료_일시*/
+            , USE_YN /*사용_여부*/
+            , REGISTER_SEQ /*등록자_시퀀스*/
+            , REGISTRATION_DT /*등록_일시*/
+            , REGISTER_IP /*등록자_IP*/
+            , EXPOSURE_YN
+            , UPDATER_IP
+            , UPDATER_SEQ
+            , UPDATE_DT
+        ) VALUES (
+              #{bbsSectionCd}
+            , #{title}
+            , #{contents}
+            , #{queryExposureBeginDt}
+            , #{queryExposureEndDt}
+            , TRUE
+            , #{registerSeq}
+            , NOW(3)
+            , #{registerIp}
+            , #{exposureYn}
+            , #{updaterIp}
+            , #{updaterSeq}
+            , NOW(3)
+         )
+    </insert>
+
+    <!-- 게시판 수정 -->
+    <update id="updateBbs" parameterType="bbsUpdateRequest">
+        /* com.example.demo.mapper.BbsMapper.updateBbs */
+        UPDATE TB_BBS SET
+              UPDATER_SEQ = #{updaterSeq}
+            , UPDATE_DT = NOW(3)
+            , BBS_SECTION_CD = #{bbsSectionCd} /*BBS_구분_코드-공지사항, FAQ, QnA*/
+            , TITLE = #{title} /*제목*/
+            , CONTENTS = #{contents} /*내용*/
+            , EXPOSURE_BEGIN_DT = #{queryExposureBeginDt} /*노출_시작_일시*/
+            , EXPOSURE_END_DT = #{queryExposureEndDt} /*노출_종료_일시*/
+            , EXPOSURE_YN = #{exposureYn} /*사용_여부*/
+            , REGISTER_IP = #{registerIp} /*등록자_IP*/
+            , UPDATER_IP = #{updaterIp} /*수정자_IP*/
+        WHERE
+            BBS_SEQ = #{bbsSeq}
+    </update>
+
+    <!-- 게시판 삭제 -->
+    <update id="deleteBbs" parameterType="bbsDeleteRequest">
+        /* com.example.demo.mapper.BbsMapper.deleteBbs */
+        UPDATE TB_BBS SET
+              UPDATER_SEQ = #{updaterSeq}
+            , UPDATE_DT = NOW(3)
+            , USE_YN = FALSE
+        WHERE
+            BBS_SEQ = #{bbsSeq}
+    </update>
+
+</mapper>

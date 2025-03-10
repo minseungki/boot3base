@@ -23,7 +23,6 @@ public class Aes256Util {
     private final int KEY_LENGTH = 256; // 256 bits
     private final int ITERATION_COUNT = 65536;
     private final String REPLACEMENT_CHAR = "rEpLaCeMeNtChAr";
-    private final String ALGORITHM = "rEpLaCeMeNtChAr";
 
     private final SecretKey secretKey;
 
@@ -41,7 +40,7 @@ public class Aes256Util {
     // Generate SecretKey from password and salt using PBKDF2
     private SecretKey generateSecretKey(String password, String salt) throws Exception {
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(StandardCharsets.UTF_8), ITERATION_COUNT, KEY_LENGTH);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         byte[] keyBytes = factory.generateSecret(spec).getEncoded();
         return new SecretKeySpec(keyBytes, AES);
     }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.MemberMapper">
+
+    <select id="selectDuplicateMember" parameterType="memberInsertRequest" resultType="memberSelectResponse">
+        /* com.example.demo.mapper.MemberMapper.selectDuplicateMember */
+        SELECT MEMBER_STATUS_CD, ID FROM MEMBER WHERE ID = #{id}
+    </select>
+
+    <insert id="insertMember" parameterType="memberInsertRequest" useGeneratedKeys="true" keyColumn="MEMBER_SEQ" keyProperty="memberSeq">
+        /* com.example.demo.mapper.MemberMapper.insertMember */
+        INSERT INTO MEMBER (
+              ID
+            , PASSWORD
+            , EMAIL
+            , NAME
+            , MOBILE_PHONE_NO
+            , MEMBER_STATUS_CD
+        ) VALUES (
+              #{id}
+            , #{password}
+            , #{email}
+            , #{name}
+            , #{mobilePhoneNo}
+            , #{memberStatusCd}
+        )
+    </insert>
+
+
+</mapper>

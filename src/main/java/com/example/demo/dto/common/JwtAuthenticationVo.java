@@ -1,6 +1,7 @@
 package com.example.demo.dto.common;
 
 import com.example.demo.dto.common.enumeration.*;
+import com.example.demo.dto.security.Role;
 import lombok.*;
 
 import java.util.Date;
@@ -17,5 +18,6 @@ public class JwtAuthenticationVo {
     private JwtType jwtType; // access token, refresh token
     private ProfileType profile; // dev, prod
     private Date expiration;
+    private Role role;
 
 }

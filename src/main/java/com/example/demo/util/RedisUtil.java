@@ -1,17 +1,17 @@
 package com.example.demo.util;
 
+import com.example.demo.dto.common.RedisAuthenticationVo;
+import com.example.demo.dto.common.enumeration.RedisCd;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -22,20 +22,42 @@ public class RedisUtil {
     private final int REDIS_SCAN_COUNT = 5000;
     private final int REDIS_SCAN_DELETE_COUNT = 3000;
 
+    @Value("${jwt.token-validity-in-time.access}")
+    private long JWT_ACCESS_EXPIRATION;
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
 
-    public void setValue(String key, Object redisData, Duration timeout) {
+    public void set(String key, Object value, Duration timeout) {
         try {
             ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
-            stringValueOperations.set(key, objectMapper.writeValueAsString(redisData), timeout);
+            stringValueOperations.set(key, objectMapper.writeValueAsString(value), timeout);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public <T> T getValue(String key, Class<T> classType) {
+    public void setOfMillis(String key, Object value, long timeout) {
+        set(key, value, Duration.ofMillis(timeout));
+    }
+    public void setOfSeconds(String key, Object value, long timeout) {
+        set(key, value, Duration.ofSeconds(timeout));
+    }
+
+    public void setOfMinutes(String key, Object value, long timeout) {
+        set(key, value, Duration.ofMinutes(timeout));
+    }
+
+    public void setOfHours(String key, Object value, long timeout) {
+        set(key, value, Duration.ofHours(timeout));
+    }
+
+    public void setOfDays(String key, Object value, long timeout) {
+        set(key, value, Duration.ofDays(timeout));
+    }
+
+    public <T> T get(String key, Class<T> classType) {
         String redisValue = stringRedisTemplate.opsForValue().get(key);
         if (null != redisValue) {
             try {
@@ -48,7 +70,7 @@ public class RedisUtil {
         }
     }
 
-    public boolean deleteKey(String delKey) {
+    public boolean remove(String delKey) {
         final RedisConnection connection = Objects.requireNonNull(stringRedisTemplate.getConnectionFactory()).getConnection();
         try {
             final Set result = new HashSet<String>();
@@ -75,64 +97,23 @@ public class RedisUtil {
 
             connection.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
+            throw ex;
         } finally {
             connection.close();
         }
         return true;
     }
 
-    public Long getCountByKeyPattern(String pattern) {
-        final RedisConnection connection = Objects.requireNonNull(stringRedisTemplate.getConnectionFactory()).getConnection();
-        try (Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(pattern).count(100).build())) {
-            long count = 0;
-            while (cursor.hasNext()) {
-                cursor.next();
-                count++;
-            }
-            return count;
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            connection.close();
-        }
+    public void setRedisUserInfo(RedisAuthenticationVo redisAuthenticationVo) {
+        String redisKey = String.join(":", RedisCd.MEM001.name(), redisAuthenticationVo.getUserId());
+        long baseTimeout = JWT_ACCESS_EXPIRATION * 1000 * 60; // 분단위
+        remove(redisKey);
+        setOfMinutes(redisKey, redisAuthenticationVo, baseTimeout);
     }
 
-    public void setRedisValueSetTimeoutOfSeconds(String key, Object redisData, long timeout) {
-        try {
-            ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
-
-            stringValueOperations.set(key, objectMapper.writeValueAsString(redisData), Duration.ofSeconds(timeout));
-        } catch (JsonProcessingException e) {
-            log.error("error : {}", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public long getListLowerTimeoutOfSec(List<LocalDateTime> list) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime minDate = Collections.min(list);
-
-        String formatDate = minDate.format(format);
-        if (formatDate.contains("99")) {
-            // 노출 종료일자에 99가 포함되면 1일을 초단위로 리턴
-            return 60 * 60 * 24;
-        } else {
-            // 노출 종료일자에 99가 포함되지 않으면 현재 시간과 차이 초단위로 리턴
-            return Duration.between(LocalDateTime.now(), minDate).getSeconds();
-        }
-    }
-
-    public String getRedisKeyByDto(Object o) {
-        String redisKey = RestUtil.classToJsonStr(o);
-        if (StringUtils.hasText(redisKey)) {
-            redisKey = redisKey
-                    .replace(":", "(")
-                    .replace(",", ")")
-                    .replace("}", ")}");
-        }
-        return redisKey;
+    public RedisAuthenticationVo getRedisUserInfo(String id) {
+        String redisKey = String.join(":", RedisCd.MEM001.name(), id);
+        return get(redisKey, RedisAuthenticationVo.class);
     }
 
 }

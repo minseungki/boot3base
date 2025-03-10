@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class RequestUtil {
 
-	private static final List<String> REMOVE_PARAM_KEY_LIST = Arrays.asList("myLatitude", "myLongitude", "password", "nowPassword", "newPassword");
+	private static final List<String> REMOVE_PARAM_KEY_LIST = Arrays.asList("password", "nowPassword", "newPassword", "mobilePhoneNo", "name", "id", "email");
 
 	public static String removeJsonObjectInKey(HttpServletRequest req) {
 		JSONObject obj = null;
@@ -34,11 +34,12 @@ public class RequestUtil {
 			for (String key : REMOVE_PARAM_KEY_LIST) {
 				boolean existKey = Optional.ofNullable(obj.get(key)).isPresent();
 				if (existKey) {
-					obj.remove(key);
+					obj.put(key, "***");
+//					obj.remove(key);
 				}
 			}
-		} catch (ParseException | IOException ex) {
-			log.info("parse error");
+		} catch (ParseException | IOException | ClassCastException ex) {
+			log.error("body parse error");
 		}
 
 		if (ObjectUtils.isEmpty(obj)) {

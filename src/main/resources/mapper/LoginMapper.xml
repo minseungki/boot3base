@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.LoginMapper">
+
+    <sql id="selectLoginSelect">
+          MEMBER_SEQ /*회원_시퀀스*/
+        , ID /*ID*/
+        , PASSWORD /*비밀번호*/
+        , PASSWORD_CHANGE_DT /*비밀번호_변경_일시*/
+        , NAME /*이름*/
+        , MOBILE_PHONE_NO /*휴대폰번호*/
+        , RECENT_LOGIN_DT /*최근_로그인_일시*/
+        , RECENT_CONNECTION_DT /*최근_접속_일시*/
+        , MEMBER_STATUS_CD /*회원_상태_코드*/
+        , LOGIN_FAILURE_COUNT /*로그인_실패_횟수*/
+        , ROLE
+    </sql>
+
+    <sql id="selectLoginWhere">
+        WHERE
+            USE_YN = TRUE
+            AND ID = #{id}
+    </sql>
+
+    <select id="findByUserId" parameterType="String" resultType="user">
+        /* com.example.demo.mapper.LoginMapper.findByUserId */
+        SELECT
+              ID AS userId
+            , PASSWORD
+            , NAME AS username
+            , ROLE
+        FROM
+            MEMBER
+        WHERE
+            USE_YN = TRUE
+            AND ID = #{id}
+
+        UNION ALL
+
+        SELECT
+              ID AS userId
+            , PASSWORD
+            , NAME AS username
+            , ROLE
+        FROM
+            DORMANCY_MEMBER
+        WHERE
+            USE_YN = TRUE
+            AND ID = #{id}
+    </select>
+
+    <select id="selectLogin" parameterType="loginRequest" resultType="loginSelectResponse">
+        /* com.example.demo.mapper.LoginMapper.selectLogin */
+        SELECT
+            <include refid="selectLoginSelect"/>
+        FROM
+            MEMBER
+        <include refid="selectLoginWhere"/>
+
+        UNION ALL
+
+        SELECT
+            <include refid="selectLoginSelect"/>
+        FROM
+            DORMANCY_MEMBER
+        <include refid="selectLoginWhere"/>
+    </select>
+
+    <select id="selectMember" parameterType="loginRequest" resultType="loginSelectResponse">
+        /* com.example.demo.mapper.LoginMapper.selectMember */
+        SELECT
+            <include refid="selectLoginSelect"/>
+        FROM
+            MEMBER
+        WHERE
+            USE_YN = TRUE
+        AND MEMBER_SEQ = #{memberSeq}
+    </select>
+
+</mapper>

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration>
-<configuration scan="true" scanPeriod="60 seconds">
+<configuration scan="true" scanPeriod="60 seconds" status="WARN">
 
     <property name="LOG_PATH" value="/var/log/tomcat"/>
-
-    <property name="LOG_FILE" value="tnkad_info.log"/>
-    <property name="LOG_ERROR_FILE" value="tnkad_info-error.log"/>
+    <property name="LOG_FILE" value="demo.log"/>
+    <property name="LOG_ERROR_FILE" value="demo-error.log"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -13,37 +12,40 @@
         </layout>
     </appender>
 
+    <!-- 일반 로그 파일 롤링 설정 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <file>${LOG_PATH}/${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>30MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>30MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%logger{36}:%L] [%-5level] - %msg%n</Pattern>
         </encoder>
     </appender>
 
+    <!-- 에러 로그 파일 롤링 설정 -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <file>${LOG_PATH}/${LOG_ERROR_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/${LOG_ERROR_FILE}-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>30MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>30MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%logger{36}:%L] [%-5level] - %msg%n</Pattern>
         </encoder>
     </appender>
 
-
-    <!-- Loggers -->
+    <!-- Logger 설정 -->
     <logger name="com.example.demo" level="DEBUG" />
     <logger name="com.zaxxer.hikari" level="INFO" />
     <logger name="jdbc.sqltiming" level="ERROR" />
@@ -51,19 +53,10 @@
     <logger name="jdbc.resultset" level="ERROR" />
     <logger name="jdbc.resultsettable" level="ERROR" />
     <logger name="jdbc.audit" level="ERROR" />
-    <logger name="com" level="ERROR" />
-    <logger name="org" level="ERROR" />
-    <logger name="org.springframework" level="ERROR" />
-    <logger name="org.mybatis.spring.batch" level="DEBUG" />
-    <logger name="springfox.documentation" level="ERROR" />
-    <logger name="springframework" level="ERROR" />
-    <logger name="io.lettuce.core.protocol" level="INFO" />
-    <logger name="net.javacrumbs.shedlock" level="DEBUG" />
 
-    <root>
+    <!-- Root Logger -->
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE" />
-        <appender-ref ref="ERROR_FILE" />
     </root>
 
 </configuration>

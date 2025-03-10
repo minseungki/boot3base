@@ -1,6 +1,5 @@
 package com.example.demo.config;
 
-import com.example.demo.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,11 +10,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-	private final JwtUtil jwtUtil;
-
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new GlobalInterceptor(jwtUtil));
+		registry.addInterceptor(new GlobalInterceptor());
 	}
 
 	@Override

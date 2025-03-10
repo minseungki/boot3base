@@ -17,8 +17,7 @@ import java.time.format.DateTimeFormatter;
 public class MapperUtil {
 
 	public static void setBaseRequest(final BaseRequest dto) {
-		LoginUtil loginUtil = new LoginUtil();
-		Long loginUserSeq = loginUtil.getLoginUserSeq();
+		Long loginUserSeq = LoginUtil.getLoginUserSeq();
 		if (null == loginUserSeq) {
 			loginUserSeq = 0L;
 		}
