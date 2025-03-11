@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
 @Alias("bbsInsertRequest")
 @Schema(description = "게시판 등록 요청 모델")
 public class BbsInsertRequest extends BaseRequest {
+	/*
+        // required = true 처리를 Validation Annotaion(@NotNull)으로 처리 한다.
+        @NotNull(message = "필수값입니다.")
+        @Schema(description = "사용자 이름", example = "홍길동", allowableValues = {"홍길동", "김수로"}, hidden = true)
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    */
 
 //    @Schema(description = "파일 목록")
 //    private List<FileUploadDto> fileList;

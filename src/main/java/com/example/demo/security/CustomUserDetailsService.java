@@ -1,11 +1,9 @@
 package com.example.demo.security;
 
 import com.example.demo.dto.common.RedisAuthenticationVo;
-import com.example.demo.dto.security.Role;
 import com.example.demo.dto.security.User;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.mapper.LoginMapper;
-import com.example.demo.util.JwtUtil;
 import com.example.demo.util.RedisUtil;
 import com.example.demo.util.RestUtil;
 import lombok.RequiredArgsConstructor;

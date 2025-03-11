@@ -24,7 +24,7 @@ public class RequestUtil {
 		JSONObject obj = null;
 		try {
 			String param = IOUtils.toString(req.getReader());
-			if(!StringUtils.hasText(param)){
+			if (!StringUtils.hasText(param)) {
 				return null;
 			}
 

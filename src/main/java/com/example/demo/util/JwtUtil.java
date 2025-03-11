@@ -1,7 +1,6 @@
 package com.example.demo.util;
 
 import com.example.demo.dto.common.JwtAuthenticationVo;
-import com.example.demo.dto.common.RedisAuthenticationVo;
 import com.example.demo.dto.common.enumeration.*;
 import com.example.demo.exception.CustomJwtException;
 import com.example.demo.security.CustomUserDetailsService;

@@ -27,8 +27,7 @@ public class MemberController {
 	@Operation(summary = "회원 가입")
 	@ApiResponseExamples(examples = {
 			@ApiResponseExample(errorCode = "ERR_MEMBER_001"),
-			@ApiResponseExample(errorCode = "ERR_MEMBER_002"),
-			@ApiResponseExample(errorCode = "ERR_MEMBER_015")
+			@ApiResponseExample(errorCode = "ERR_MEMBER_002")
 	})
 	public ResponseEntity<ResponseModel<LoginResponse>> insert(@Valid @RequestBody MemberInsertRequest req) {
 		return RestUtil.ok(service.insert(req));
