@@ -46,6 +46,9 @@ public class SpringDocConfig {
     @Value("${jwt.header-refresh}")
     private String HEADER_AUTH_REFRESH;
 
+    @Value("${jwt.prefix}")
+    private String HEADER_PREFIX;
+
     private final String UNAUTHORIZED_DESCRIPTION = "인증 오류";
     private final String FALSIFY_DESCRIPTION = ErrorCode.ERR401_002.getDesc();
 
@@ -55,21 +58,21 @@ public class SpringDocConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .openapi("3.0.0")
-                .info(new Info().title("데모 프로젝트 REST API 문서")
-                    .version("1.0.0")
-                    .description(getDescription()))
-                .components(new Components()
-                    .addSecuritySchemes(HEADER_AUTH, new SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("Bearer")
-                        .bearerFormat("JWT")
-                        .name(HEADER_AUTH)
-                        .description("Enter your JWT token")
-                    ))
-                .addSecurityItem(new SecurityRequirement().addList(HEADER_AUTH))
-                .tags(TagsConfig.TAGS)
-                ;
+            .openapi("3.0.0")
+            .info(new Info().title("데모 프로젝트 REST API 문서")
+                .version("1.0.0")
+                .description(getDescription())) // description
+            .components(new Components()
+                .addSecuritySchemes(HEADER_AUTH, new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("Bearer")
+                    .bearerFormat("JWT")
+                    .name(HEADER_AUTH)
+                    .description("Enter your JWT token")
+                )) // 공통 헤더 추가 (Authorize 버튼 생성)
+            .addSecurityItem(new SecurityRequirement().addList(HEADER_AUTH)) // Swagger UI에서 모든 API 요청 시 Authorization 헤더를 추가할 수 있도록 설정
+            .tags(TagsConfig.TAGS) // 등록된 태그 불러 오기
+            ;
     }
 
     @Bean
@@ -175,7 +178,7 @@ public class SpringDocConfig {
             if (operation.getParameters() != null) {
                 for (io.swagger.v3.oas.models.parameters.Parameter parameter : operation.getParameters()) {
                     if (HEADER_AUTH_REFRESH.equals(parameter.getName())) {
-                        parameter.setSchema(new io.swagger.v3.oas.models.media.StringSchema()._default("Bearer "));
+                        parameter.setSchema(new io.swagger.v3.oas.models.media.StringSchema()._default(HEADER_PREFIX));
                     }
                 }
             }

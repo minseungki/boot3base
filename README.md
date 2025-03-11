@@ -436,7 +436,6 @@ public Object requestLogging(ProceedingJoinPoint proceedingJoinPoint) throws Thr
 }
 ```
 
-
 ### JWT (JwtUtil.java)
 - 토큰 정보 (info) Aes256방식 암호화
 ```java
@@ -463,7 +462,6 @@ public String generateToken(JwtAuthenticationVo jwtAuthenticationVo) {
             .compact();
 }
 ```
-
 - 토큰 정보 (JwtAuthenticationVo)
 ```java
 public class JwtAuthenticationVo {
@@ -479,9 +477,7 @@ public class JwtAuthenticationVo {
 }
 ```
 
-
 ### Swagger (SpringDocConfig.java)
-
 [스웨거 가이드 (클라이언트)](./doc/client.md)
 
 [스웨거 가이드 (백엔드)](./doc/backend.md)
