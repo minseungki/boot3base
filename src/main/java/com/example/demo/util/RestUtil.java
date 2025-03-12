@@ -221,12 +221,12 @@ public class RestUtil {
 
         String param = RequestUtil.removeMapInKey(request);
         if (StringUtils.hasText(param)) {
-            log.error("Param \t: " + param);
+            log.error("Param \t\t\t: " + param);
         }
 
         String body = RequestUtil.removeJsonObjectInKey(request);
         if (StringUtils.hasText(body)) {
-            log.error("Body \t: " + body);
+            log.error("Body \t\t\t: " + body);
         }
 
         if (!ObjectUtils.isEmpty(error.getCause())) {
